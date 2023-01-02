@@ -54,12 +54,9 @@ function Login() {
             .then((snapshot) => {
               snapshot.docs.map((doc) => {
                 sessionStorage.setItem("user", JSON.stringify(doc.data()));
-                return doc;
+                return navigate("/chat-room");
               });
             });
-          setTimeout(() => {
-            navigate("/chat-room");
-          }, [1000]);
         }
       } else {
         navigate("/login");
