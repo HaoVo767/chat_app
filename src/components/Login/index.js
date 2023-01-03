@@ -46,6 +46,7 @@ function Login() {
         if (user?.additionalUserInfo?.isNewUser) {
           sessionStorage.setItem("user", JSON.stringify(user));
           message.success("Hello  " + user.displayName);
+          navigate("/chat-room");
         } else {
           db.collection("users")
             .where("uid", "==", user?.uid)

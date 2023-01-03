@@ -115,8 +115,8 @@ export default function UserInfo() {
             </Avatar>
           </Dropdown>
           <Typography
-            style={{ display: eventChangeName ? "none" : "block" }}
-            className="font-bold text-lg ml-2 mt-1 text-slate-100"
+            style={{ display: eventChangeName ? "none" : "block", width: "250px" }}
+            className="font-bold text-lg ml-2 mt-1 text-slate-100 overflow-hidden"
           >
             {user?.displayName}
           </Typography>
