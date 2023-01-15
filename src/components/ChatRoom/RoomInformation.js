@@ -5,17 +5,46 @@ import { db } from "../../firebase/configure";
 import { AppContext } from "../../Context/AppProvider";
 import { debounce } from "lodash";
 import Members from "./Members";
+import Icons from "../ulity/Icons";
+import { BsPeopleFill, BsFillPinAngleFill } from "react-icons/bs";
+import { TiDeleteOutline } from "react-icons/ti";
+import { useSelector, useDispatch } from "react-redux";
+import { MessagesSlice } from "./MessagesSlice";
 
 export default function RoomInformation() {
-  const { selectedRoom, isLoading, setIsLoading, setSelectedRoomId } = useContext(AppContext);
+  const { selectedRoom, setSelectedRoomId } = useContext(AppContext);
   const [members, setMembers] = useState([]);
   const [isModalInvite, setisModalInvite] = useState(false);
   const [value, setValue] = useState([]);
   const [isOpenDrawer, setIsOpenDrawer] = useState(false);
   const [isOpenModalChangeRoomName, setIsOpenModalChangeRoomName] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [nameValue, setNameValue] = useState("");
+  const [descriptionValue, setDescriptionValue] = useState("");
+  const [isOpenIconsRoomName, setIsOpenIconsRoomName] = useState(false);
+  const [isOpenIconsDescription, setIsOpenIconsDescription] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const selectedRoomId = sessionStorage.getItem("roomId");
   const [form] = Form.useForm();
+  const backgroundColor = user?.mode === "LIGHT" ? "rgb(229 231 235)" : "#000";
+  const textColor = user?.mode === "LIGHT" ? "#111" : "#EEE";
+  const roomNameIcon = useSelector((state) => state.messages?.changeRoomNameIcon);
+  const roomDescriptionIcon = useSelector((state) => state.messages?.changeDescriptionIcon);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (roomNameIcon) {
+      setNameValue((prev) => prev + String.fromCodePoint(roomNameIcon));
+      dispatch(MessagesSlice.actions.addIconsChangeRoomName(null));
+    }
+  }, [roomNameIcon, dispatch]);
+
+  useEffect(() => {
+    if (roomDescriptionIcon) {
+      setDescriptionValue((prev) => prev + String.fromCodePoint(roomDescriptionIcon));
+      dispatch(MessagesSlice.actions.addIconsChangeDescription(null));
+    }
+  }, [roomDescriptionIcon, dispatch]);
 
   const DebounceSelect = ({ fetchOptions, debounceTimeout = 300, ...props }) => {
     const [fetching, setFetching] = useState(false);
@@ -24,7 +53,6 @@ export default function RoomInformation() {
       const loadOptions = (value) => {
         setOptions([]);
         setFetching(false);
-
         fetchOptions(value, props.curmembers).then((newOptions) => {
           setOptions(newOptions);
           setFetching(false);
@@ -43,7 +71,7 @@ export default function RoomInformation() {
       >
         {options.map((opt) => (
           <Select.Option key={opt.value} value={opt.value} title={opt.label}>
-            <Avatar size="small" src={opt.photoURL} key={opt.value} className="mx-2 bg-lime-700">
+            <Avatar size="small" src={opt.photoURL} key={opt.value} className="mx-2">
               {opt.photoURL ? "" : opt?.label?.charAt(0).toUpperCase()}
             </Avatar>
             {`${opt.label}`}
@@ -66,7 +94,6 @@ export default function RoomInformation() {
             value: doc.data().uid,
             photoURL: doc.data().photoURL,
           }))
-
           .filter((opt) => !curmembers.includes(opt.value));
       });
   };
@@ -75,26 +102,36 @@ export default function RoomInformation() {
     setIsOpenModalChangeRoomName(true);
   };
   const handleCancelChangeRoomName = () => {
-    form.setFieldsValue({ name: "" });
+    // form.setFieldsValue({ name: "" });
     setIsOpenModalChangeRoomName(false);
+    setIsOpenIconsRoomName(false);
+    setIsOpenIconsDescription(false);
+    setNameValue("");
+    setDescriptionValue("");
   };
   const handleOkChangeRoomName = () => {
     setIsOpenModalChangeRoomName(false);
-    if (form.getFieldValue()?.name?.trim() !== "" && JSON.stringify(form.getFieldValue()) !== "{}") {
-      const roomId = selectedRoomId || "1";
-      const roomRef = db.collection("rooms").doc(roomId);
-      if (form.getFieldValue()?.description) {
-        roomRef.update({
-          name: form.getFieldValue()?.name,
-          description: form.getFieldValue()?.description,
-        });
-      } else {
-        roomRef.update({
-          name: form.getFieldValue()?.name,
-        });
-      }
+    // if (form.getFieldValue()?.name?.trim() !== "" && JSON.stringify(form.getFieldValue()) !== "{}") {
+    const roomId = selectedRoomId || "1";
+    const roomRef = db.collection("rooms").doc(roomId);
+    if (nameValue.trim() !== "") {
+      roomRef.update({
+        // name: form.getFieldValue()?.name,
+        // description: form.getFieldValue()?.description,
+        name: nameValue,
+        description: descriptionValue,
+      });
+      // } else {
+      //   roomRef.update({
+      //     name: form.getFieldValue()?.name,
+      //   });
+      // }
     }
-    form.setFieldsValue({ name: "", description: "" });
+    // form.setFieldsValue({ name: "", description: "" });
+    setIsOpenIconsRoomName(false);
+    setIsOpenIconsDescription(false);
+    setNameValue("");
+    setDescriptionValue("");
   };
 
   const handleOpenModalInvite = () => {
@@ -148,7 +185,7 @@ export default function RoomInformation() {
                 console.error("Error removing document: ", error);
               });
           }
-          setIsLoading(false);
+          // setIsLoading(false);
           setIsOpenDrawer(false);
           setSelectedRoomId(null);
           sessionStorage.removeItem("roomId");
@@ -159,8 +196,19 @@ export default function RoomInformation() {
       .catch((error) => {
         console.log("Error getting document:", error);
       });
+    return setIsLoading(false);
   };
-
+  const handleClosePinMessage = () => {
+    const roomId = selectedRoomId || "1";
+    const roomRef = db.collection("rooms").doc(roomId);
+    roomRef.get().then((doc) => {
+      if (doc.exists) {
+        roomRef.update({
+          messagePin: "",
+        });
+      }
+    });
+  };
   useEffect(() => {
     const listUsers = [];
     db.collection("users")
@@ -178,23 +226,25 @@ export default function RoomInformation() {
   return (
     <>
       <div
-        className="flex justify-between p-2 bg-slate-200"
+        className="flex justify-between pt-2 border-r-[1px] border-t-[1px] border-stone-300 h-[70px]"
         style={{
+          background: backgroundColor,
+          borderBottom: "1px solid rgb(214 211 209)",
           display: selectedRoomId ? "" : "none",
         }}
       >
         <div>
           <div className="flex">
-            <p className="text-xl font-bold mx-4 mt-[2px]" style={{ fontFamily: "Helvetica" }}>
+            <p className="text-xl font-bold mx-4 mt-[2px]" style={{ fontFamily: "Helvetica", color: textColor }}>
               {selectedRoom?.name}
             </p>
             <div className="cursor-pointer text-lg relative bottom-[2px]">
               <Tooltip placement="right" title="Change room name">
-                <EditOutlined onClick={handleOpenModalChangeRoomName} />
+                <EditOutlined onClick={handleOpenModalChangeRoomName} style={{ color: textColor }} />
               </Tooltip>
             </div>
           </div>
-          <span className="text-base mx-4" style={{ fontFamily: "Helvetica" }}>
+          <span className="text-base mx-4" style={{ fontFamily: "Helvetica", color: textColor }}>
             {selectedRoom?.description}
           </span>
         </div>
@@ -205,13 +255,14 @@ export default function RoomInformation() {
             className="relative top-[-13px] right-2"
             type="text"
             onClick={handleOpenModalInvite}
+            style={{ color: textColor }}
           >
             Invite
           </Button>
           <Avatar.Group size="large" maxCount={3} className="mr-8 cursor-pointer">
             {members.map((member) => (
               <Tooltip title={member.displayName} key={member.uid}>
-                <Avatar src={member.photoURL} className="font-semibold text-2xl bg-blue-500" onClick={showDrawer}>
+                <Avatar src={member.photoURL} className="font-semibold text-2xl bg-slate-100" onClick={showDrawer}>
                   {member.photoURL ? "" : member?.displayName?.charAt(0).toUpperCase()}
                 </Avatar>
               </Tooltip>
@@ -240,10 +291,43 @@ export default function RoomInformation() {
         >
           <Form form={form} layout="vertical" size="large">
             <Form.Item label="Name" name="name" className="font-semibold">
-              <Input placeholder="Enter new room name" size="" />
+              <div className="flex">
+                <div className="w-full">
+                  <Input
+                    placeholder="Enter new room name"
+                    value={nameValue}
+                    onChange={(e) => setNameValue(e.target.value)}
+                    onFocus={() => {
+                      setIsOpenIconsRoomName(false);
+                      setIsOpenIconsDescription(false);
+                    }}
+                  />
+                </div>
+                <div onClick={() => setIsOpenIconsRoomName(true)} className="relative right-10 top-[-10px]">
+                  <Icons bottom={"-320px"} righr={"30px"} isOpenIcons={isOpenIconsRoomName} place={"changeRoomName"} />
+                </div>
+              </div>
             </Form.Item>
             <Form.Item label="description" name="description" className="font-semibold">
-              <Input placeholder="Enter new description" size="" />
+              <div className="flex">
+                <Input.TextArea
+                  placeholder="Enter new description"
+                  value={descriptionValue}
+                  onFocus={() => {
+                    setIsOpenIconsDescription(false);
+                    setIsOpenIconsRoomName(false);
+                  }}
+                  onChange={(e) => setDescriptionValue(e.target.value)}
+                />
+                <div onClick={() => setIsOpenIconsDescription(true)} className="relative right-10 top-[-10px]">
+                  <Icons
+                    bottom={"-320px"}
+                    righr={"30px"}
+                    isOpenIcons={isOpenIconsDescription}
+                    place={"changeDescription"}
+                  />
+                </div>
+              </div>
             </Form.Item>
           </Form>
         </Modal>
@@ -251,8 +335,8 @@ export default function RoomInformation() {
         <Modal
           title="Invite member"
           open={isModalInvite}
-          className="bg-cyan-200"
           closable={false}
+          style={{ backgroundColor: backgroundColor }}
           footer={[
             <Button onClick={handleCancelInvite} key="cancel" size="large">
               Cancel
@@ -283,7 +367,13 @@ export default function RoomInformation() {
           </Form>
         </Modal>
 
-        <Drawer title="Members" placement="right" onClose={onCloseDrawer} open={isOpenDrawer}>
+        <Drawer
+          title="Members"
+          extra={<BsPeopleFill className="text-2xl text-gray-600 relative right-48 bottom-[2px]" />}
+          placement="right"
+          onClose={onCloseDrawer}
+          open={isOpenDrawer}
+        >
           {members.map((member) => {
             return <Members member={member} key={member.uid} />;
           })}
@@ -293,6 +383,35 @@ export default function RoomInformation() {
           </Button>
         </Drawer>
       </div>
+      {selectedRoom && selectedRoom?.messagePin !== "" && (
+        <div
+          className="flex cursor-pointer h-16"
+          style={{
+            backgroundColor: user.mode === "LIGHT" ? "#EEE" : "rgb(17 17 17)",
+            color: textColor,
+            overflowX: "hidden",
+            borderBottom: "1px solid grey",
+            borderRight: "1px solid white",
+            fontFamily: "Helvetica",
+          }}
+        >
+          <div>
+            <div className="flex">
+              <div className="flex text-lg ml-3">
+                <BsFillPinAngleFill className="mt-2 mr-2" />
+                <Avatar src={JSON.parse(selectedRoom?.messagePin).photoURL} />
+              </div>
+              <div className="text-base font-semibold mt-1 ml-2">
+                {JSON.parse(selectedRoom?.messagePin).displayName}
+              </div>
+            </div>
+            <div className="text-base ml-20">{JSON.parse(selectedRoom?.messagePin).text}</div>
+          </div>
+          <div onClick={handleClosePinMessage}>
+            <TiDeleteOutline className=" absolute right-2 text-2xl mt-2 mr-5 text-gray-500 cursor-pointer" />
+          </div>
+        </div>
+      )}
     </>
   );
 }

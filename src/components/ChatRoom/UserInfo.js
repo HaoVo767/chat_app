@@ -1,27 +1,41 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Button, Avatar, Typography, message, Dropdown, Input } from "antd";
+import React, { useContext, useEffect, useMemo, useState } from "react";
+import { Avatar, Typography, message, Dropdown, Input, Switch } from "antd";
 import firebase, { db } from "../../firebase/configure";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { LoginSlice } from "../Login/LoginSlice";
 import { generateKeywords } from "../../firebase/service";
 import { useFirestore } from "../../hooks/useFirestore";
-import { PoweroffOutlined } from "@ant-design/icons";
+import { AiOutlineEdit, AiOutlinePicture } from "react-icons/ai";
+import { MdLogout } from "react-icons/md";
+import { HiSun, HiMoon } from "react-icons/hi";
+import { AppContext } from "../../Context/AppProvider";
+import Icons from "../ulity/Icons";
+import { useSelector, useDispatch } from "react-redux";
+import { MessagesSlice } from "./MessagesSlice";
 
 export default function UserInfo() {
+  const { backgroundColor, setBackgroundColor, textColor, setTextColor } = useContext(AppContext);
   const [eventChangeName, setEventChangeName] = useState(false);
+  const [isOpenIconsChangeDisplayName, setIsOpenIconsChangeDisplayName] = useState(false);
   const userDisplayName = JSON.parse(sessionStorage.getItem("user"))?.displayName;
   const [value, setValue] = useState(userDisplayName);
-  const dispatch = useDispatch();
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const initBackgroundColor = user?.mode === "LIGHT" ? "#EEE" : "#000";
   const navigate = useNavigate();
-  const userId = JSON.parse(sessionStorage.getItem("user"))?.uid;
-  const userPhotoUrl = JSON.parse(sessionStorage.getItem("user"))?.photoURL;
+  const displayNameIcon = useSelector((state) => state.messages?.changeDisplayNameIcon);
+  const dispatch = useDispatch();
+
   useEffect(() => {
     if (!sessionStorage.getItem("user")) {
       navigate("/login");
     }
   }, [navigate]);
-  const user = JSON.parse(sessionStorage.getItem("user"));
+
+  useEffect(() => {
+    if (displayNameIcon) {
+      setValue((prev) => prev + String.fromCodePoint(displayNameIcon));
+      dispatch(MessagesSlice.actions.addIconsChangeDisplayName(null));
+    }
+  }, [displayNameIcon, dispatch]);
   const handleChangeUserName = () => {
     setEventChangeName(true);
   };
@@ -30,9 +44,9 @@ export default function UserInfo() {
     return {
       fieldName: "uid",
       operator: "==",
-      compareValue: userId,
+      compareValue: user?.uid,
     };
-  }, [userId]);
+  }, [user?.uid]);
   const currentUser = useFirestore("users", userCondition);
   const handleChangeInputName = (e) => {
     setValue(e.target.value);
@@ -40,14 +54,9 @@ export default function UserInfo() {
 
   const handleEnterNewName = () => {
     setEventChangeName(false);
+    setIsOpenIconsChangeDisplayName(false);
     const user = sessionStorage.getItem("user");
     const userData = JSON.parse(user);
-    dispatch(
-      LoginSlice.actions.storeUser({
-        ...userData,
-        displayName: value,
-      })
-    );
     const userWithNewDisplayName = {
       ...userData,
       displayName: value,
@@ -76,70 +85,135 @@ export default function UserInfo() {
         message.error(error);
       });
   };
+
+  const handleChangeMode = (mode) => {
+    const userRef = db.collection("users").doc(currentUser[0].id);
+    if (mode) {
+      const updateMode = {
+        ...user,
+        mode: "LIGHT",
+      };
+      sessionStorage.setItem("user", JSON.stringify(updateMode));
+      setBackgroundColor("#EEE");
+      setTextColor("#111");
+      userRef.update({
+        mode: "LIGHT",
+      });
+    } else {
+      const updateMode = {
+        ...user,
+        mode: "DARK",
+      };
+      sessionStorage.setItem("user", JSON.stringify(updateMode));
+      setBackgroundColor("#000");
+      setTextColor("#EEE");
+      userRef.update({
+        mode: "DARK",
+      });
+    }
+  };
   const items = [
     {
       key: "1",
       label: (
-        <span style={{ fontFamily: "Helvetica" }} className="text-base" onClick={handleChangeUserName}>
-          Change name
-        </span>
+        <div className="flex hover:text-blue-400">
+          <span style={{ fontFamily: "Helvetica" }} className="text-base" onClick={handleChangeUserName}>
+            Change name
+          </span>
+          <AiOutlineEdit className="relative left-2 text-xl" />
+        </div>
       ),
     },
     {
       key: "2",
       label: (
-        <a
-          style={{ fontFamily: "Helvetica" }}
-          className="text-base "
-          target="_blank"
-          rel="noopener noreferrer"
-          href={`${userPhotoUrl}?redirect=true?type=large&redirect=true&width=500&height=500`}
-        >
-          View profile picture
-        </a>
+        <div className="flex hover:text-blue-400">
+          <a
+            style={{ fontFamily: "Helvetica" }}
+            className="text-base "
+            target="_blank"
+            rel="noopener noreferrer"
+            href={`${user.photoURL}?redirect=true?type=large&redirect=true&width=500&height=500`}
+          >
+            View profile picture
+          </a>
+          <AiOutlinePicture className="relative left-2 text-xl" />
+        </div>
+      ),
+    },
+    {
+      key: "3",
+      label: (
+        <div className="flex hover:text-blue-400" onClick={handleLogout}>
+          <span style={{ fontFamily: "Helvetica" }} className="text-base">
+            Log out
+          </span>
+          <MdLogout className="relative left-2 text-xl" />
+        </div>
       ),
     },
   ];
 
   return (
     <>
-      <div className="flex h-[72px] bg-gray-800">
+      <div
+        className="flex h-[68px] justify-between"
+        style={{
+          backgroundColor: backgroundColor === initBackgroundColor ? backgroundColor : initBackgroundColor,
+        }}
+      >
         <div className="flex ml-8 mt-4">
           <Dropdown
             menu={{
               items,
             }}
+            trigger={["click"]}
+            placement="bottomLeft"
+            arrow
+            overlayStyle={{ width: "250px" }}
           >
-            <Avatar size="large" src={user?.photoURL} className="font-semibold text-2xl bg-blue-500 cursor-pointer">
+            <Avatar size="large" src={user?.photoURL} className="text-2xl bg-slate-100 cursor-pointer">
               {user?.photoURL ? "" : user?.displayName?.charAt(0).toUpperCase()}
             </Avatar>
           </Dropdown>
           <Typography
-            style={{ display: eventChangeName ? "none" : "block", width: "250px" }}
+            style={{ display: eventChangeName ? "none" : "block", width: "250px", color: textColor }}
             className="font-bold text-lg ml-2 mt-1 text-slate-100 overflow-hidden"
           >
             {user?.displayName}
           </Typography>
-          <Input
-            style={{ display: eventChangeName ? "block" : "none", height: "40px", border: "1px solid blue" }}
-            className="ml-2 text-lg font-semibold cursor-auto"
-            size="small"
-            width="200px"
-            value={value}
-            onPressEnter={handleEnterNewName}
-            onChange={handleChangeInputName}
-          />
+          <div style={{ display: eventChangeName ? "block" : "none" }}>
+            <div className="flex">
+              <div className="w-full">
+                <Input
+                  style={{ height: "40px" }}
+                  className="ml-2 text-lg font-semibold cursor-auto"
+                  size="small"
+                  width="200px"
+                  value={value}
+                  onPressEnter={handleEnterNewName}
+                  onChange={handleChangeInputName}
+                  onFocus={() => setIsOpenIconsChangeDisplayName(false)}
+                />
+              </div>
+              <div className="relative right-8 bottom-[10px]" onClick={() => setIsOpenIconsChangeDisplayName(true)}>
+                <Icons
+                  isOpenIcons={isOpenIconsChangeDisplayName}
+                  place={"changeDisplayName"}
+                  bottom={"-330px"}
+                  right={"-50px"}
+                />
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="mx-6">
-          <Button
-            size="large"
-            className="mt-4 absolute right-4 font-bold text-slate-100 hover:bg-slate-100"
-            onClick={handleLogout}
-            style={{ borderRadius: "5px", width: "120px" }}
-            icon={<PoweroffOutlined className="relative bottom-1" />}
-          >
-            Log out
-          </Button>
+        <div className="my-[22px] relative right-12">
+          <Switch
+            checkedChildren={<HiSun className="text-xl text-yellow-400 relative bottom-[3px]" />}
+            unCheckedChildren={<HiMoon className="text-base relative left-2 top-[1px]" />}
+            defaultChecked={user?.mode === "LIGHT" ? true : false}
+            onChange={handleChangeMode}
+          />
         </div>
       </div>
     </>

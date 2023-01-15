@@ -22,6 +22,7 @@ function Login() {
         uid: user.uid,
         providerId: additionalUserInfo.providerId,
         keywords: generateKeywords(user.displayName),
+        mode: "LIGHT",
       });
     }
   };
@@ -36,6 +37,7 @@ function Login() {
         uid: user.uid,
         providerId: additionalUserInfo.providerId,
         keywords: generateKeywords(user.displayName),
+        mode: "LIGHT",
       });
     }
   };

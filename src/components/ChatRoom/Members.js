@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Avatar } from "antd";
 import { AppContext } from "../../Context/AppProvider";
 import { db } from "../../firebase/configure";
+import { BsAwardFill } from "react-icons/bs";
 
 export default function Members({ member }) {
   const { selectedRoom, setIsLoading, isLoading } = useContext(AppContext);
@@ -34,8 +35,18 @@ export default function Members({ member }) {
   return (
     <>
       <div className="flex justify-between mb-4">
-        <div>
-          <Avatar src={member.photoURL} className="font-semibold text-2xl bg-blue-500 ml-5" size="large">
+        <div className="flex">
+          <div>
+            {selectedRoom?.host === member.uid && (
+              <BsAwardFill className="text-2xl relative top-2 right-3 text-yellow-500" />
+            )}
+          </div>
+          <Avatar
+            src={member.photoURL}
+            className="font-semibold text-2xl bg-slate-100"
+            size="large"
+            style={{ marginLeft: selectedRoom?.host === member.uid ? "0px" : "24px" }}
+          >
             {member.photoURL ? "" : member?.displayName?.charAt(0).toUpperCase()}
           </Avatar>
           <span className="mt-1 ml-2 text-lg font-semibold">{member.displayName}</span>

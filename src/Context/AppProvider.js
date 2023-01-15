@@ -5,8 +5,13 @@ export const AppContext = createContext();
 
 export default function AppProvider({ children }) {
   const user = JSON.parse(sessionStorage.getItem("user"));
+  const initBackgroundColor = user?.mode === "LIGHT" ? "#EEE" : "#000";
+  const initTextColor = user?.mode === "LIGHT" ? "#111" : "#EEE";
+  const [backgroundColor, setBackgroundColor] = useState(initBackgroundColor);
+  const [textColor, setTextColor] = useState(initTextColor);
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isOpenIcons, setIsOpenIcons] = useState(false);
   const roomsCondition = useMemo(() => {
     return {
       fieldName: "members",
@@ -28,6 +33,12 @@ export default function AppProvider({ children }) {
         selectedRoom,
         setIsLoading,
         isLoading,
+        backgroundColor,
+        setBackgroundColor,
+        textColor,
+        setTextColor,
+        isOpenIcons,
+        setIsOpenIcons,
       }}
     >
       {children}
