@@ -102,7 +102,6 @@ export default function RoomInformation() {
     setIsOpenModalChangeRoomName(true);
   };
   const handleCancelChangeRoomName = () => {
-    // form.setFieldsValue({ name: "" });
     setIsOpenModalChangeRoomName(false);
     setIsOpenIconsRoomName(false);
     setIsOpenIconsDescription(false);
@@ -111,23 +110,14 @@ export default function RoomInformation() {
   };
   const handleOkChangeRoomName = () => {
     setIsOpenModalChangeRoomName(false);
-    // if (form.getFieldValue()?.name?.trim() !== "" && JSON.stringify(form.getFieldValue()) !== "{}") {
     const roomId = selectedRoomId || "1";
     const roomRef = db.collection("rooms").doc(roomId);
     if (nameValue.trim() !== "") {
       roomRef.update({
-        // name: form.getFieldValue()?.name,
-        // description: form.getFieldValue()?.description,
         name: nameValue,
         description: descriptionValue,
       });
-      // } else {
-      //   roomRef.update({
-      //     name: form.getFieldValue()?.name,
-      //   });
-      // }
     }
-    // form.setFieldsValue({ name: "", description: "" });
     setIsOpenIconsRoomName(false);
     setIsOpenIconsDescription(false);
     setNameValue("");
@@ -185,7 +175,6 @@ export default function RoomInformation() {
                 console.error("Error removing document: ", error);
               });
           }
-          // setIsLoading(false);
           setIsOpenDrawer(false);
           setSelectedRoomId(null);
           sessionStorage.removeItem("roomId");

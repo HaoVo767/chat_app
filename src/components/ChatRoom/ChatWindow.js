@@ -11,7 +11,7 @@ import { MessagesSlice } from "./MessagesSlice";
 
 export default function ChatWindow() {
   const dispatch = useDispatch();
-  const { rooms, selectedRoom, setSelectedRoomId, setIsOpenIcons } = useContext(AppContext);
+  const { rooms, selectedRoom, setSelectedRoomId } = useContext(AppContext);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const [isRoomChange, setIsRoomChange] = useState(false);
   const [scroll, setScroll] = useState(false);
@@ -88,7 +88,7 @@ export default function ChatWindow() {
       <CarouselChatWindow />
       <RoomInformation />
 
-      <div className="flex flex-1 w-full max-h-full relative" onClick={() => setIsOpenIcons(false)}>
+      <div className="flex flex-1 w-full max-h-full relative">
         <div
           className="flex flex-col w-full absolute top-0 bottom-0"
           style={{

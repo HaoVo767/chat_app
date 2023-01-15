@@ -7,22 +7,23 @@ import { useFirestore } from "../../hooks/useFirestore";
 import { AiOutlineEdit, AiOutlinePicture } from "react-icons/ai";
 import { MdLogout } from "react-icons/md";
 import { HiSun, HiMoon } from "react-icons/hi";
-import { AppContext } from "../../Context/AppProvider";
 import Icons from "../ulity/Icons";
 import { useSelector, useDispatch } from "react-redux";
 import { MessagesSlice } from "./MessagesSlice";
+import { AppContext } from "../../Context/AppProvider";
 
 export default function UserInfo() {
-  const { backgroundColor, setBackgroundColor, textColor, setTextColor } = useContext(AppContext);
   const [eventChangeName, setEventChangeName] = useState(false);
   const [isOpenIconsChangeDisplayName, setIsOpenIconsChangeDisplayName] = useState(false);
+  const { setModeChange } = useContext(AppContext);
   const userDisplayName = JSON.parse(sessionStorage.getItem("user"))?.displayName;
   const [value, setValue] = useState(userDisplayName);
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const initBackgroundColor = user?.mode === "LIGHT" ? "#EEE" : "#000";
   const navigate = useNavigate();
   const displayNameIcon = useSelector((state) => state.messages?.changeDisplayNameIcon);
   const dispatch = useDispatch();
+  const background = user.mode === "LIGHT" ? "#EEE" : "#000";
+  const textColor = user.mode === "LIGHT" ? "#111" : "#EEE";
 
   useEffect(() => {
     if (!sessionStorage.getItem("user")) {
@@ -89,24 +90,22 @@ export default function UserInfo() {
   const handleChangeMode = (mode) => {
     const userRef = db.collection("users").doc(currentUser[0].id);
     if (mode) {
+      setModeChange("LIGHT");
       const updateMode = {
         ...user,
         mode: "LIGHT",
       };
       sessionStorage.setItem("user", JSON.stringify(updateMode));
-      setBackgroundColor("#EEE");
-      setTextColor("#111");
       userRef.update({
         mode: "LIGHT",
       });
     } else {
+      setModeChange("DARK");
       const updateMode = {
         ...user,
         mode: "DARK",
       };
       sessionStorage.setItem("user", JSON.stringify(updateMode));
-      setBackgroundColor("#000");
-      setTextColor("#EEE");
       userRef.update({
         mode: "DARK",
       });
@@ -159,7 +158,7 @@ export default function UserInfo() {
       <div
         className="flex h-[68px] justify-between"
         style={{
-          backgroundColor: backgroundColor === initBackgroundColor ? backgroundColor : initBackgroundColor,
+          backgroundColor: background,
         }}
       >
         <div className="flex ml-8 mt-4">

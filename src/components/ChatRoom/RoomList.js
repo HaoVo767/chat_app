@@ -16,11 +16,23 @@ export default function RoomList() {
   const [descriptionValue, setDescriptionValue] = useState("");
   const [isOpenIconsRoomName, setIsOpenIconsRoomName] = useState(false);
   const [isOpenIconsDescription, setIsOpenIconsDescription] = useState(false);
-  const { setSelectedRoomId, backgroundColor, textColor } = useContext(AppContext);
-  const initBackgroundColor = user?.mode === "LIGHT" ? "#EEE" : "#000";
+  const initbackground = user.mode === "LIGHT" ? "EEE" : "#000";
+  const initTextColor = user.mode === "LIGHT" ? "#111" : "#EEE";
+  const [background, setBackground] = useState(initbackground);
+  const [textColor, setTextColor] = useState(initTextColor);
+  const { setSelectedRoomId } = useContext(AppContext);
   const roomNameIcon = useSelector((state) => state.messages?.createRoomNameIcon);
   const roomDescriptionIcon = useSelector((state) => state.messages?.createDescriptionIcon);
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (user.mode === "LIGHT") {
+      setTextColor("#111");
+      setBackground("#EEE");
+    } else {
+      setTextColor("#EEE");
+      setBackground("#000");
+    }
+  }, [user.mode]);
   useEffect(() => {
     if (roomNameIcon) {
       setNameValue((prev) => prev + String.fromCodePoint(roomNameIcon));
@@ -50,7 +62,7 @@ export default function RoomList() {
   };
   const handleOk = () => {
     setIsModalOpen(false);
-    if (form.getFieldValue()?.name?.trim() !== "" && JSON.stringify(form.getFieldValue()) !== "{}") {
+    if (nameValue.trim() !== "" && JSON.stringify(form.getFieldValue()) !== "{}") {
       addDocument("rooms", {
         name: nameValue,
         description: descriptionValue,
@@ -77,10 +89,7 @@ export default function RoomList() {
   }, [rooms, setSelectedRoomId]);
   return (
     <>
-      <div
-        className="h-full"
-        style={{ background: backgroundColor === initBackgroundColor ? backgroundColor : initBackgroundColor }}
-      >
+      <div className="h-full" style={{ background: background }}>
         <div>
           <Button
             icon={<PlusOutlined className="relative bottom-1 left-1" />}
@@ -137,7 +146,7 @@ export default function RoomList() {
       <Modal
         title="Create Room"
         open={isModalOpen}
-        style={{ background: backgroundColor }}
+        style={{ background: background }}
         closable={false}
         footer={[
           <Button onClick={handleCancel} key="cancel" size="large">
