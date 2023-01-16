@@ -140,28 +140,30 @@ export function MessageMe({ text, displayName, createAt, photoURL, messageId, re
               }}
               className="text-base"
             >
-              <div className="flex relative right-5">
-                <BsFillReplyAllFill className="mr-1 mt-1" />
-                {displayName} replied to {replyFrom?.displayName}
-              </div>
-              <div
-                style={{
-                  color: user.mode === "LIGHT" ? "rgb(75 85 99)" : "rgb(209 213 219)",
-                  border: "1px solid rgb(107 114 128)",
-                  width: "max-content",
-                  maxWidth: "800px",
-                  minWidth: "200px",
-                  padding: "10px",
-                  borderRadius: "10px 10px 0 10px",
-                  overflow: "hidden",
-                }}
-                className="mr-24 text-base relative"
-              >
-                <div className="text-base font-semibold" style={{ fontFamily: "Helvetica" }}>
-                  {replyFrom?.displayName}
+              <div className="relative top-5">
+                <div className="flex relative right-10" style={{ overflow: "hidden", height: "22px" }}>
+                  <BsFillReplyAllFill className="mr-1 mt-1" />
+                  {displayName} replied to {replyFrom?.displayName}
                 </div>
-                <div className="ml-4" style={{ fontFamily: "Helvetica" }}>
-                  {replyFrom.text}
+                <div
+                  style={{
+                    color: user.mode === "LIGHT" ? "rgb(75 85 99)" : "rgb(209 213 219)",
+                    border: "1px solid rgb(107 114 128)",
+                    width: "max-content",
+                    maxWidth: "800px",
+                    minWidth: "200px",
+                    padding: "10px",
+                    borderRadius: "10px 10px 0 10px",
+                    overflow: "hidden",
+                  }}
+                  className="mr-24 text-base"
+                >
+                  <div className="text-base font-semibold" style={{ fontFamily: "Helvetica" }}>
+                    {replyFrom?.displayName}
+                  </div>
+                  <div className="ml-4" style={{ fontFamily: "Helvetica" }}>
+                    {replyFrom.text}
+                  </div>
                 </div>
               </div>
             </div>
@@ -174,9 +176,9 @@ export function MessageMe({ text, displayName, createAt, photoURL, messageId, re
                 color: user.mode === "LIGHT" ? "rgb(75 85 99)" : "rgb(209 213 219)",
                 float: "right",
               }}
-              className="text-base"
+              className="text-base relative top-5"
             >
-              <div className="flex relative right-5">
+              <div className="flex relative right-5 mt-5">
                 <BsFillReplyAllFill className="mr-1 mt-1" />
                 {displayName} replied
               </div>
@@ -185,12 +187,12 @@ export function MessageMe({ text, displayName, createAt, photoURL, messageId, re
                   color: "rgb(107 114 128)",
                   border: "1px solid rgb(107 114 128)",
                   width: "max-content",
-                  padding: "10px",
+                  padding: "20px",
                   borderRadius: "10px 10px 0 10px",
                 }}
                 className="mr-24 text-base relative"
               >
-                Message has been deleted
+                message has been deleted
               </div>
             </div>
           </div>
@@ -249,7 +251,7 @@ export function MessageMeDeleted() {
           fontFamily: "Helvetica",
           border: "1px solid rgb(107 114 128)",
         }}
-        className="mb-5 ml-5 p-5 rounded-xl mr-20 text-base"
+        className="ml-5 p-5 rounded-xl mr-20 text-base mt-5"
       >
         message has been deleted
       </div>

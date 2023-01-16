@@ -21,6 +21,7 @@ export default function ChatWindow() {
   const messagesEndRef = useRef(null);
   const topMessage = useRef(null);
   const selectedRoomId = sessionStorage.getItem("roomId");
+  const chatWindowRef = useRef(null);
   const scrollToNewestMessage = () => {
     messagesEndRef.current?.scrollIntoView();
   };
@@ -82,13 +83,15 @@ export default function ChatWindow() {
       setScroll(false);
     }
     scrollToNewestMessage();
+    console.log("scrollHeight ", chatWindowRef.current.scrollHeight);
+    console.log("offsetHeight ", chatWindowRef.current.offsetHeight);
   }, [messages.length]);
   return (
     <div className="flex flex-col h-full">
       <CarouselChatWindow />
       <RoomInformation />
 
-      <div className="flex flex-1 w-full max-h-full relative">
+      <div className="flex flex-1 w-full max-h-full relative" ref={chatWindowRef}>
         <div
           className="flex flex-col w-full absolute top-0 bottom-0"
           style={{

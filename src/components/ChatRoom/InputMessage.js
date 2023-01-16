@@ -13,7 +13,7 @@ export default function InputMessage() {
   const [form] = Form.useForm();
   const icon = useSelector((state) => state.messages?.messageIcon);
   const messagesReply = useSelector((state) => state.messages?.replyMessage);
-  const { textColor, selectedRoom } = useContext(AppContext);
+  const { selectedRoom } = useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
   const [isOpenIcons, setIsOpenIcons] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
@@ -94,7 +94,7 @@ export default function InputMessage() {
                 placeholder="enter message..."
                 autoSize={{ maxRows: 10 }}
                 bordered={false}
-                style={{ fontSize: "20px", borderRadius: "0px", color: textColor }}
+                style={{ fontSize: "20px", borderRadius: "0px", color: user.mode === "LIGHT" ? "#111" : "#EEE" }}
                 onChange={handleInputChange}
                 onPressEnter={(event) => {
                   event.preventDefault();
