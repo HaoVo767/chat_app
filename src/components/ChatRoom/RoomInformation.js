@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { Button, Avatar, Tooltip, Form, Modal, Input, Select, Spin, Drawer } from "antd";
+import { Button, Avatar, Tooltip, Form, Modal, Input, Select, Spin, Drawer, Radio, Row, Col } from "antd";
 import { EditOutlined, UserAddOutlined } from "@ant-design/icons";
 import { db } from "../../firebase/configure";
 import { AppContext } from "../../Context/AppProvider";
@@ -23,6 +23,7 @@ export default function RoomInformation() {
   const [descriptionValue, setDescriptionValue] = useState("");
   const [isOpenIconsRoomName, setIsOpenIconsRoomName] = useState(false);
   const [isOpenIconsDescription, setIsOpenIconsDescription] = useState(false);
+  const [radioInputValue, setRadioInputValue] = useState(1);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const selectedRoomId = sessionStorage.getItem("roomId");
   const [form] = Form.useForm();
@@ -80,12 +81,30 @@ export default function RoomInformation() {
       </Select>
     );
   };
-  const fetchUserList = async (search, curmembers) => {
+  const fetchUserListByName = async (search, curmembers) => {
     return db
       .collection("users")
       .where("keywords", "array-contains", search)
       .orderBy("displayName")
       .limit(20)
+      .get()
+      .then((snapshot) => {
+        return snapshot.docs
+          .map((doc) => ({
+            label: doc.data().displayName,
+            value: doc.data().uid,
+            photoURL: doc.data().photoURL,
+          }))
+          .filter((opt) => !curmembers.includes(opt.value));
+      });
+  };
+
+  const fetchUserListById = async (search, curmembers) => {
+    return db
+      .collection("users")
+      .where("uid", "==", search)
+      .orderBy("createAt")
+      .limit(1)
       .get()
       .then((snapshot) => {
         return snapshot.docs
@@ -198,6 +217,11 @@ export default function RoomInformation() {
       }
     });
   };
+
+  const RadioInputChange = (e) => {
+    setRadioInputValue(e.target.value);
+  };
+
   useEffect(() => {
     const listUsers = [];
     db.collection("users")
@@ -341,14 +365,25 @@ export default function RoomInformation() {
             </Button>,
           ]}
         >
+          <Row className="">
+            <Col span={20}>
+              <Radio.Group className="mb-2" onChange={RadioInputChange} value={radioInputValue}>
+                <Radio value={1}>Name</Radio>
+                <Radio value={2}>ID</Radio>
+              </Radio.Group>
+            </Col>
+            <Col span={4} className="sm cursor-pointer">
+              My Friends
+            </Col>
+          </Row>
           <Form>
             <DebounceSelect
               mode="multiple"
               name="search-user"
               label="Invite member"
               value={value}
-              placeholder="enter member name"
-              fetchOptions={fetchUserList}
+              placeholder=""
+              fetchOptions={radioInputValue === 1 ? fetchUserListByName : fetchUserListById}
               onChange={(newValue) => setValue(newValue)}
               style={{ width: "100%" }}
               curmembers={selectedRoom?.members}
@@ -372,6 +407,7 @@ export default function RoomInformation() {
           </Button>
         </Drawer>
       </div>
+
       {selectedRoom && selectedRoom?.messagePin !== "" && (
         <div
           className="flex cursor-pointer h-16"

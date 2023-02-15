@@ -20,10 +20,18 @@ export default function RoomList() {
   const initTextColor = user.mode === "LIGHT" ? "#111" : "#EEE";
   const [background, setBackground] = useState(initbackground);
   const [textColor, setTextColor] = useState(initTextColor);
-  const { setSelectedRoomId } = useContext(AppContext);
+  const { setSelectedRoomId, typeRoom, setFriendChatId } = useContext(AppContext);
   const roomNameIcon = useSelector((state) => state.messages?.createRoomNameIcon);
   const roomDescriptionIcon = useSelector((state) => state.messages?.createDescriptionIcon);
   const dispatch = useDispatch();
+  useEffect(() => {
+    if (typeRoom === "1") {
+      sessionStorage.removeItem("friendChat");
+      sessionStorage.removeItem("roomId");
+      setSelectedRoomId(null);
+      setFriendChatId(null);
+    }
+  }, [typeRoom, setSelectedRoomId, setFriendChatId]);
   useEffect(() => {
     if (user.mode === "LIGHT") {
       setTextColor("#111");
@@ -89,7 +97,7 @@ export default function RoomList() {
   }, [rooms, setSelectedRoomId]);
   return (
     <>
-      <div className="h-full" style={{ background: background }}>
+      <div className="h-screen" style={{ background: background }}>
         <div>
           <Button
             icon={<PlusOutlined className="relative bottom-1 left-1" />}
@@ -156,7 +164,6 @@ export default function RoomList() {
             Create
           </Button>,
         ]}
-        onClick={() => console.log("click")}
       >
         <Form form={form} layout="vertical" size="large">
           <Form.Item label="Room name" name="name" className="font-semibold">

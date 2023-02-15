@@ -5,13 +5,16 @@ import InputMessage from "./InputMessage";
 import { AppContext } from "../../Context/AppProvider";
 import { db } from "../../firebase/configure";
 import RoomInformation from "./RoomInformation";
+import RoomInfoForFriendChat from "./RoomInfoForFriendChat";
 import { CarouselChatWindow } from "../ulity/Carousel";
 import { useDispatch } from "react-redux";
 import { MessagesSlice } from "./MessagesSlice";
+import ChatWindowForFriendChat from "./ChatWindowForFriendChat";
+import InputForFriendChat from "./InputForFriendChat";
 
 export default function ChatWindow() {
   const dispatch = useDispatch();
-  const { rooms, selectedRoom, setSelectedRoomId } = useContext(AppContext);
+  const { rooms, selectedRoom, setSelectedRoomId, friendChatId, typeRoom } = useContext(AppContext);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const [isRoomChange, setIsRoomChange] = useState(false);
   const [scroll, setScroll] = useState(false);
@@ -22,10 +25,10 @@ export default function ChatWindow() {
   const topMessage = useRef(null);
   const selectedRoomId = sessionStorage.getItem("roomId");
   const chatWindowRef = useRef(null);
+  const backgroundColor = user?.mode === "LIGHT" ? "rgb(226 232 240)" : "#111";
   const scrollToNewestMessage = () => {
     messagesEndRef.current?.scrollIntoView();
   };
-  const backgroundColor = user?.mode === "LIGHT" ? "rgb(226 232 240)" : "#111";
   useEffect(() => {
     if (!selectedRoom) {
       setSelectedRoomId(null);
@@ -47,7 +50,7 @@ export default function ChatWindow() {
       }
     });
     return setIsGetMessage(true);
-  }, [selectedRoom?.messages, selectedRoomId, dispatch]);
+  }, [selectedRoom?.messages, selectedRoomId, dispatch, typeRoom]);
 
   useEffect(() => {
     if (!selectedRoom) {
@@ -56,6 +59,7 @@ export default function ChatWindow() {
     }
     if (sessionStorage.getItem("roomId")) {
       setSelectedRoomId(sessionStorage.getItem("roomId"));
+      sessionStorage.removeItem("friendChat");
     }
   }, [rooms, selectedRoom, setSelectedRoomId]);
 
@@ -83,70 +87,75 @@ export default function ChatWindow() {
       setScroll(false);
     }
     scrollToNewestMessage();
-    console.log("scrollHeight ", chatWindowRef.current.scrollHeight);
-    console.log("offsetHeight ", chatWindowRef.current.offsetHeight);
   }, [messages.length]);
   return (
     <div className="flex flex-col h-full">
-      <CarouselChatWindow />
-      <RoomInformation />
+      {!friendChatId && <CarouselChatWindow />}
+      {!friendChatId && <RoomInformation />}
+      {friendChatId && <RoomInfoForFriendChat />}
 
-      <div className="flex flex-1 w-full max-h-full relative" ref={chatWindowRef}>
-        <div
-          className="flex flex-col w-full absolute top-0 bottom-0"
-          style={{
-            background: backgroundColor,
-            display: selectedRoomId ? "" : "none",
-            overflowY: "scroll",
-            justifyContent: scroll ? "" : "end",
-          }}
-        >
-          {chatWindowSpin && <Spin size="large" className="absolute left-1/2 inset-y-1/2" />}
-          <div ref={topMessage}></div>
-          {!isRoomChange &&
-            isGetMessage &&
-            messages.map((message, index) => {
-              if (message.uid === user.uid && message.delete === 0) {
-                return (
-                  <MessageMe
-                    key={index}
-                    text={message.text}
-                    displayName={message.displayName}
-                    createAt={message.createAt?.seconds}
-                    photoURL={message.photoURL}
-                    messageId={message.id}
-                    replyFrom={message?.replyFrom}
-                    emotions={message?.emotion}
-                  />
-                );
-              } else if (message.uid === user.uid && message.delete === 1) {
-                return <MessageMeDeleted key={index} />;
-              } else if (message.uid !== user.uid && message.delete === 0) {
-                return (
-                  <MessageYou
-                    key={index}
-                    text={message.text}
-                    displayName={message.displayName}
-                    createAt={message.createAt?.seconds}
-                    photoURL={message.photoURL}
-                    messageId={message.id}
-                    replyFrom={message?.replyFrom}
-                    emotions={message?.emotion}
-                  />
-                );
-              } else if (message.uid !== user.uid && message.delete === 1) {
-                return <MessageYouDeleted key={index} />;
-              }
-              return isRoomChange;
-            })}
-          <div ref={messagesEndRef}></div>
+      {!friendChatId && (
+        <div className="flex flex-1 w-full max-h-full relative" ref={chatWindowRef}>
+          <div
+            className="flex flex-col w-full absolute top-0 bottom-0"
+            style={{
+              background: backgroundColor,
+              display: selectedRoomId ? "" : "none",
+              overflowY: "scroll",
+              justifyContent: scroll ? "" : "end",
+            }}
+          >
+            {chatWindowSpin && <Spin size="large" className="absolute left-1/2 inset-y-1/2" />}
+            <div ref={topMessage}></div>
+            {!isRoomChange &&
+              isGetMessage &&
+              messages.map((message, index) => {
+                if (message.uid === user.uid && message.delete === 0) {
+                  return (
+                    <MessageMe
+                      key={index}
+                      text={message.text}
+                      displayName={message.displayName}
+                      createAt={message.createAt?.seconds}
+                      photoURL={message.photoURL}
+                      messageId={message.id}
+                      replyFrom={message?.replyFrom}
+                      emotions={message?.emotion}
+                    />
+                  );
+                } else if (message.uid === user.uid && message.delete === 1) {
+                  return <MessageMeDeleted key={index} />;
+                } else if (message.uid !== user.uid && message.delete === 0) {
+                  return (
+                    <MessageYou
+                      key={index}
+                      text={message.text}
+                      displayName={message.displayName}
+                      createAt={message.createAt?.seconds}
+                      photoURL={message.photoURL}
+                      messageId={message.id}
+                      replyFrom={message?.replyFrom}
+                      emotions={message?.emotion}
+                    />
+                  );
+                } else if (message.uid !== user.uid && message.delete === 1) {
+                  return <MessageYouDeleted key={index} />;
+                }
+                return isRoomChange;
+              })}
+            <div ref={messagesEndRef}></div>
+          </div>
         </div>
-      </div>
+      )}
+      {friendChatId && <ChatWindowForFriendChat />}
       <div style={{ background: user.mode === "LIGHT" ? "#EEE" : "rgb(17 17 17)" }}>
         <ReplyMessage />
       </div>
       <div style={{ background: user?.mode === "LIGHT" ? "#EEE" : "#000" }}>
         <InputMessage />
+      </div>
+      <div style={{ background: user?.mode === "LIGHT" ? "#EEE" : "#000" }}>
+        <InputForFriendChat />
       </div>
     </div>
   );

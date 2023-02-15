@@ -23,6 +23,8 @@ function Login() {
         providerId: additionalUserInfo.providerId,
         keywords: generateKeywords(user.displayName),
         mode: "LIGHT",
+        friends: [],
+        requests: [],
       });
     }
   };
@@ -38,6 +40,8 @@ function Login() {
         providerId: additionalUserInfo.providerId,
         keywords: generateKeywords(user.displayName),
         mode: "LIGHT",
+        friends: [],
+        requests: [],
       });
     }
   };

@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import UserInfo from "./UserInfo";
-import RoomList from "./RoomList";
+// import RoomList from "./RoomList";
+import RoomChatAndFriendChatTab from "./RoomChatAndFriendChatTab";
 import { AppContext } from "../../Context/AppProvider";
 
 export default function SideBar() {
@@ -17,7 +18,8 @@ export default function SideBar() {
           background: backgroundColor,
         }}
       >
-        <RoomList />
+        {/* <RoomList /> */}
+        <RoomChatAndFriendChatTab />
       </div>
     </div>
   );

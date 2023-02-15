@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { Dropdown, Tooltip, Drawer } from "antd";
 import { BsThreeDots, BsFillReplyAllFill, BsFillPinAngleFill } from "react-icons/bs";
 import { useSelector } from "react-redux";
@@ -6,35 +6,61 @@ import { db } from "../../firebase/configure";
 import { useDispatch } from "react-redux";
 import { MessagesSlice } from "./MessagesSlice";
 import { RiDeleteBin5Line } from "react-icons/ri";
+import { AppContext } from "../../Context/AppProvider";
 
 export function MessageOptionMe({ messageId }) {
+  const { typeRoom } = useContext(AppContext);
   const messages = useSelector((state) => state.messages?.messages);
   const selectedRoomId = sessionStorage.getItem("roomId");
+  const friendChatRoomId = sessionStorage.getItem("friendChat");
   const dispatch = useDispatch();
   const handleDeleteMessage = () => {
-    const roomId = selectedRoomId || "1";
-    const roomRef = db.collection("rooms").doc(roomId);
-    roomRef.get().then((doc) => {
-      if (doc.exists) {
-        let messagesCopy = doc.data().messages;
-        messagesCopy.map((message, index) => {
-          if (message.id === messageId) {
-            messagesCopy.splice(index, 1, { ...message, delete: 1 });
-            for (let i = index + 1; i < messagesCopy.length; i++) {
-              if (messagesCopy[i]?.replyFrom?.id === messageId) {
-                messagesCopy[i] = { ...messagesCopy[i], replyFrom: "deleted" };
+    if (typeRoom === 1) {
+      const roomId = selectedRoomId || "1";
+      const roomRef = db.collection("rooms").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let messagesCopy = doc.data().messages;
+          messagesCopy.map((message, index) => {
+            if (message.id === messageId) {
+              messagesCopy.splice(index, 1, { ...message, delete: 1 });
+              for (let i = index + 1; i < messagesCopy.length; i++) {
+                if (messagesCopy[i]?.replyFrom?.id === messageId) {
+                  messagesCopy[i] = { ...messagesCopy[i], replyFrom: "deleted" };
+                }
               }
             }
-          }
-          return roomRef.update({
-            messages: [...messagesCopy],
+            return roomRef.update({
+              messages: [...messagesCopy],
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      const roomId = friendChatRoomId || "1";
+      const roomRef = db.collection("friendChat").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let messagesCopy = doc.data().messages;
+          messagesCopy.map((message, index) => {
+            if (message.id === messageId) {
+              messagesCopy.splice(index, 1, { ...message, delete: 1 });
+              for (let i = index + 1; i < messagesCopy.length; i++) {
+                if (messagesCopy[i]?.replyFrom?.id === messageId) {
+                  messagesCopy[i] = { ...messagesCopy[i], replyFrom: "deleted" };
+                }
+              }
+            }
+            return roomRef.update({
+              messages: [...messagesCopy],
+            });
+          });
+        }
+      });
+    }
   };
   const handleReplyMessage = () => {
-    messages.map((message) => {
+    messages?.map((message) => {
       if (message.id === messageId) {
         dispatch(MessagesSlice.actions.replyMessage(message));
         return message;
@@ -43,21 +69,39 @@ export function MessageOptionMe({ messageId }) {
     });
   };
   const handlePinMessage = () => {
-    const roomId = selectedRoomId || "1";
-    const roomRef = db.collection("rooms").doc(roomId);
-    roomRef.get().then((doc) => {
-      if (doc.exists) {
-        let pinMessage = "";
-        messages.map((message) => {
-          if (message.id === messageId) {
-            pinMessage = JSON.stringify(message);
-          }
-          return roomRef.update({
-            messagePin: pinMessage,
+    if (typeRoom === 1) {
+      const roomId = selectedRoomId || "1";
+      const roomRef = db.collection("rooms").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let pinMessage = "";
+          messages?.map((message) => {
+            if (message.id === messageId) {
+              pinMessage = JSON.stringify(message);
+            }
+            return roomRef.update({
+              messagePin: pinMessage,
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      const roomId = friendChatRoomId || "1";
+      const roomRef = db.collection("friendChat").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let pinMessage = "";
+          messages.map((message) => {
+            if (message.id === messageId) {
+              pinMessage = JSON.stringify(message);
+            }
+            return roomRef.update({
+              messagePin: pinMessage,
+            });
+          });
+        }
+      });
+    }
   };
   const items = [
     {
@@ -105,11 +149,13 @@ export function MessageOptionMe({ messageId }) {
 }
 
 export function MessageOptionYou({ messageId }) {
+  const { typeRoom } = useContext(AppContext);
   const messages = useSelector((state) => state.messages?.messages);
   const selectedRoomId = sessionStorage.getItem("roomId");
+  const friendChatRoomId = sessionStorage.getItem("friendChat");
   const dispatch = useDispatch();
   const handleReplyMessage = () => {
-    messages.map((message) => {
+    messages?.map((message) => {
       if (message.id === messageId) {
         dispatch(MessagesSlice.actions.replyMessage(message));
         return message;
@@ -118,21 +164,39 @@ export function MessageOptionYou({ messageId }) {
     });
   };
   const handlePinMessage = () => {
-    const roomId = selectedRoomId || "1";
-    const roomRef = db.collection("rooms").doc(roomId);
-    roomRef.get().then((doc) => {
-      if (doc.exists) {
-        let pinMessage = "";
-        messages.map((message) => {
-          if (message.id === messageId) {
-            pinMessage = JSON.stringify(message);
-          }
-          return roomRef.update({
-            messagePin: pinMessage,
+    if (typeRoom === 1) {
+      const roomId = selectedRoomId || "1";
+      const roomRef = db.collection("rooms").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let pinMessage = "";
+          messages.map((message) => {
+            if (message.id === messageId) {
+              pinMessage = JSON.stringify(message);
+            }
+            return roomRef.update({
+              messagePin: pinMessage,
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      const roomId = friendChatRoomId || "1";
+      const roomRef = db.collection("friendChat").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let pinMessage = "";
+          messages.map((message) => {
+            if (message.id === messageId) {
+              pinMessage = JSON.stringify(message);
+            }
+            return roomRef.update({
+              messagePin: pinMessage,
+            });
+          });
+        }
+      });
+    }
   };
   const items = [
     {

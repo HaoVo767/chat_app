@@ -2,10 +2,8 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { MessagesSlice } from "../ChatRoom/MessagesSlice";
 import { BsEmojiSmile } from "react-icons/bs";
-// import { AppContext } from "../../Context/AppProvider";
 
 export default function Icons({ bottom, right, isOpenIcons, place }) {
-  // const { isOpenIcons, setIsOpenIcons } = useContext(AppContext);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const dispatch = useDispatch();
   const icons = [
@@ -349,10 +347,7 @@ export default function Icons({ bottom, right, isOpenIcons, place }) {
             </span>
           ))}
         </div>
-        <BsEmojiSmile
-          className="text-gray-500 text-xl cursor-pointer top-5 relative left-3"
-          // onClick={handleOpenIcons}
-        />
+        <BsEmojiSmile className="text-gray-500 text-xl cursor-pointer top-5 relative left-3" />
       </div>
     </div>
   );

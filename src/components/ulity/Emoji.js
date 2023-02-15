@@ -5,7 +5,8 @@ import { AppContext } from "../../Context/AppProvider";
 import { db } from "../../firebase/configure";
 
 export const MessageEmotion = ({ messageId, placement }) => {
-  const { selectedRoomId } = useContext(AppContext);
+  const { selectedRoomId, typeRoom } = useContext(AppContext);
+  const friendChatRoomId = sessionStorage.getItem("friendChat");
   const handleAddEmotion = (emotion) => {
     const user = JSON.parse(sessionStorage.getItem("user"));
     const addEmotion = [
@@ -15,21 +16,39 @@ export const MessageEmotion = ({ messageId, placement }) => {
         emotion: emotion,
       },
     ];
-    const roomId = selectedRoomId || "1";
-    const roomRef = db.collection("rooms").doc(roomId);
-    roomRef.get().then((doc) => {
-      if (doc.exists) {
-        let messagesCopy = doc.data().messages;
-        doc.data().messages.map((message, index) => {
-          if (message.id === messageId) {
-            messagesCopy.splice(index, 1, { ...message, emotion: [...message?.emotion, ...addEmotion] });
-          }
-          return roomRef.update({
-            messages: [...messagesCopy],
+    if (typeRoom === 1) {
+      const roomId = selectedRoomId || "1";
+      const roomRef = db.collection("rooms").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let messagesCopy = doc.data().messages;
+          doc.data().messages.map((message, index) => {
+            if (message.id === messageId) {
+              messagesCopy.splice(index, 1, { ...message, emotion: [...message?.emotion, ...addEmotion] });
+            }
+            return roomRef.update({
+              messages: [...messagesCopy],
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    } else {
+      const roomId = friendChatRoomId || "1";
+      const roomRef = db.collection("friendChat").doc(roomId);
+      roomRef.get().then((doc) => {
+        if (doc.exists) {
+          let messagesCopy = doc.data().messages;
+          doc.data().messages.map((message, index) => {
+            if (message.id === messageId) {
+              messagesCopy.splice(index, 1, { ...message, emotion: [...message?.emotion, ...addEmotion] });
+            }
+            return roomRef.update({
+              messages: [...messagesCopy],
+            });
+          });
+        }
+      });
+    }
   };
   const items = [
     {

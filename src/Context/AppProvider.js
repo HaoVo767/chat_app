@@ -7,7 +7,11 @@ export default function AppProvider({ children }) {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const initMode = user?.mode;
   const [selectedRoomId, setSelectedRoomId] = useState("");
+  const [selectedFriendChatRoom, setSelectedFriendChatRoom] = useState("");
   const [modeChange, setModeChange] = useState(initMode);
+  const [typeRoom, setTypeRoom] = useState(1);
+  const [friendChatId, setFriendChatId] = useState(null);
+  const [friendChatMessages, setSetFriendChatMessages] = useState([]);
   const roomsCondition = useMemo(() => {
     return {
       fieldName: "members",
@@ -16,7 +20,6 @@ export default function AppProvider({ children }) {
     };
   }, [user?.uid]);
   const rooms = useFirestore("rooms", roomsCondition);
-
   const currentRoomId = sessionStorage.getItem("roomId");
   const selectedRoom = currentRoomId ? rooms.find((room) => room.id === selectedRoomId) : null;
 
@@ -29,6 +32,14 @@ export default function AppProvider({ children }) {
         selectedRoom,
         modeChange,
         setModeChange,
+        typeRoom,
+        setTypeRoom,
+        friendChatId,
+        setFriendChatId,
+        selectedFriendChatRoom,
+        setSelectedFriendChatRoom,
+        friendChatMessages,
+        setSetFriendChatMessages,
       }}
     >
       {children}

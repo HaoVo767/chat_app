@@ -10,7 +10,6 @@ export const CarouselChatWindow = () => {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const backgroundColor = user.mode === "LIGHT" ? "#EEE" : "#000";
   const textColor = user.mode === "LIGHT" ? "#000" : "#EEE";
-  // const selectedRoomId = sessionStorage.getItem("roomId");
   return (
     <div
       style={{
