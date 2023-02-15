@@ -8,6 +8,7 @@ import { MessagesSlice } from "./MessagesSlice";
 export default function FriendChatTab() {
   const userStore = useSelector((state) => state.user.user);
   const user = JSON.parse(sessionStorage.getItem("user"));
+  const friendChatRoomId = sessionStorage.getItem("friendChat");
   const dispatch = useDispatch();
   const friends = userStore?.friends;
   const { typeRoom, setSelectedRoomId, setFriendChatId, setSelectedFriendChatRoom, setSetFriendChatMessages } =
@@ -21,6 +22,23 @@ export default function FriendChatTab() {
     }
   }, [typeRoom, setSelectedRoomId, setFriendChatId]);
 
+  useEffect(() => {
+    if (friendChatRoomId) {
+      db.collection("friendChat")
+        .doc(friendChatRoomId)
+        .onSnapshot((doc) => {
+          // console.log("Current data: ", doc.data());
+          if (doc.data()) {
+            setSetFriendChatMessages(doc.data().messages);
+            let messagesCopy = [];
+            doc.data().messages.map((message) => {
+              messagesCopy = [...messagesCopy, { ...message, createAt: null }];
+              return dispatch(MessagesSlice.actions.storeMessages(messagesCopy));
+            });
+          }
+        });
+    }
+  }, [dispatch, friendChatRoomId, setSetFriendChatMessages]);
   const handleSetFriendChatRoomId = (id) => {
     if (userStore?.id) {
       db.collection("friendChat")
@@ -31,12 +49,12 @@ export default function FriendChatTab() {
             if (doc.data().members.includes(id)) {
               setSelectedFriendChatRoom(doc.data());
               sessionStorage.setItem("friendChat", doc.id);
-              setSetFriendChatMessages(doc.data().messages);
-              let messagesCopy = [];
-              doc.data().messages.map((message) => {
-                messagesCopy = [...messagesCopy, { ...message, createAt: null }];
-                return dispatch(MessagesSlice.actions.storeMessages(messagesCopy));
-              });
+              // setSetFriendChatMessages(doc.data().messages);
+              // let messagesCopy = [];
+              // doc.data().messages.map((message) => {
+              //   messagesCopy = [...messagesCopy, { ...message, createAt: null }];
+              //   return dispatch(MessagesSlice.actions.storeMessages(messagesCopy));
+              // });
             }
           });
         });
