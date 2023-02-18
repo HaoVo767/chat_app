@@ -7,7 +7,7 @@ import { AppContext } from "../../Context/AppProvider";
 
 export default function RoomChatAndFriendChatTab() {
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const { setTypeRoom } = useContext(AppContext);
+  const { typeRoom, setTypeRoom } = useContext(AppContext);
   const onChange = (key) => {
     setTypeRoom(key);
   };

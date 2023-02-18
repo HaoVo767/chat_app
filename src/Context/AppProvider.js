@@ -9,7 +9,7 @@ export default function AppProvider({ children }) {
   const [selectedRoomId, setSelectedRoomId] = useState("");
   const [selectedFriendChatRoom, setSelectedFriendChatRoom] = useState("");
   const [modeChange, setModeChange] = useState(initMode);
-  const [typeRoom, setTypeRoom] = useState(1);
+  const [typeRoom, setTypeRoom] = useState("1");
   const [friendChatId, setFriendChatId] = useState(null);
   const [friendChatMessages, setSetFriendChatMessages] = useState([]);
   const roomsCondition = useMemo(() => {

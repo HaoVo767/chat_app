@@ -10,6 +10,7 @@ import { BsPeopleFill, BsFillPinAngleFill } from "react-icons/bs";
 import { TiDeleteOutline } from "react-icons/ti";
 import { useSelector, useDispatch } from "react-redux";
 import { MessagesSlice } from "./MessagesSlice";
+import { Friend } from "./FriendAndRequest";
 
 export default function RoomInformation() {
   const { selectedRoom, setSelectedRoomId } = useContext(AppContext);
@@ -24,6 +25,7 @@ export default function RoomInformation() {
   const [isOpenIconsRoomName, setIsOpenIconsRoomName] = useState(false);
   const [isOpenIconsDescription, setIsOpenIconsDescription] = useState(false);
   const [radioInputValue, setRadioInputValue] = useState(1);
+  const [isModalInviteMyFriend, setIsModalInviteMyFriend] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const selectedRoomId = sessionStorage.getItem("roomId");
   const [form] = Form.useForm();
@@ -373,7 +375,7 @@ export default function RoomInformation() {
               </Radio.Group>
             </Col>
             <Col span={4} className="sm cursor-pointer">
-              My Friends
+              <div onClick={() => setIsModalInviteMyFriend(true)}>My Friends</div>
             </Col>
           </Row>
           <Form>
@@ -437,6 +439,36 @@ export default function RoomInformation() {
           </div>
         </div>
       )}
+      <Modal
+        title="Invite member"
+        open={isModalInviteMyFriend}
+        closable={true}
+        style={{ left: "530px" }}
+        footer={[
+          <Button
+            onClick={() => {
+              setIsModalInviteMyFriend(false);
+            }}
+            key="cancel"
+            size="large"
+          >
+            Cancel
+          </Button>,
+        ]}
+      >
+        {user?.friends.length > 0 &&
+          user?.friends.map((friend) => {
+            return (
+              <Friend
+                displayName={friend?.displayName}
+                photoURL={friend?.photoURL}
+                yourId={friend?.id}
+                key={friend?.id}
+                myId={user?.id}
+              />
+            );
+          })}
+      </Modal>
     </>
   );
 }

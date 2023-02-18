@@ -1,5 +1,6 @@
 import { Avatar, Button, Col, Row, Typography } from "antd";
-import React, { useMemo } from "react";
+import React, { useContext, useMemo } from "react";
+import { AppContext } from "../../Context/AppProvider";
 import { db } from "../../firebase/configure";
 import { addDocument } from "../../firebase/service";
 import { useFirestore } from "../../hooks/useFirestore";
@@ -82,15 +83,6 @@ export function Request({ displayName, photoURL, uid, userSentRequetsId, userRec
 }
 
 export function Friend({ displayName, photoURL, yourId, myId }) {
-  // const handleOpenFriendChat = () => {
-  //   db.collection("friendChat")
-  //     .where("uid", "==", "12345")
-  //     .get()
-  //     .then((querySnapshot) => {
-  // querySnapshot.forEach((doc) => {
-  // });
-  // });
-  // };
   return (
     <Row className="mb-3">
       <Col span={2}></Col>
