@@ -25,6 +25,7 @@ function Login() {
         mode: "LIGHT",
         friends: [],
         requests: [],
+        listFriendsUid: [],
       });
     }
   };
