@@ -80,7 +80,7 @@ export default function ChatWindow() {
 
   useEffect(() => {
     const chatWindowHeight =
-      messagesEndRef.current.getBoundingClientRect().y - topMessage.current.getBoundingClientRect().y;
+      messagesEndRef?.current?.getBoundingClientRect().y - topMessage?.current?.getBoundingClientRect().y;
     if (messages?.length > 9 || chatWindowHeight > window.innerHeight - 122) {
       setScroll(true);
     } else {

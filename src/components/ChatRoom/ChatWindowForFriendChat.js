@@ -1,12 +1,12 @@
 import { Spin } from "antd";
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+// import { useSelector } from "react-redux";
 import { AppContext } from "../../Context/AppProvider";
 import { MessageMe, MessageMeDeleted, MessageYou, MessageYouDeleted } from "./Message";
 
 export default function ChatWindowForFriendChat() {
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const userStore = useSelector((state) => state.user.user);
+  // const userStore = useSelector((state) => state.user.user);
   const { friendChatId, friendChatMessages, setSetFriendChatMessages } = useContext(AppContext);
   const [scroll, setScroll] = useState(false);
   const [isGetMessage, setIsGetMessage] = useState(false);
@@ -15,9 +15,9 @@ export default function ChatWindowForFriendChat() {
   const messagesEndRef = useRef(null);
   const topMessage = useRef(null);
   const backgroundColor = user?.mode === "LIGHT" ? "rgb(226 232 240)" : "#111";
-  const friendId = sessionStorage.getItem("friendChat");
+  // const friendId = sessionStorage.getItem("friendChat");
   const scrollToNewestMessage = () => {
-    messagesEndRef.current?.scrollIntoView();
+    messagesEndRef?.current?.scrollIntoView();
   };
   useEffect(() => {
     if (friendChatMessages) {
@@ -48,7 +48,7 @@ export default function ChatWindowForFriendChat() {
 
   useEffect(() => {
     const chatWindowHeight =
-      messagesEndRef.current.getBoundingClientRect().y - topMessage.current.getBoundingClientRect().y;
+      messagesEndRef?.current?.getBoundingClientRect().y - topMessage?.current?.getBoundingClientRect().y;
     if (friendChatMessages?.length > 9 || chatWindowHeight > window.innerHeight - 122) {
       setScroll(true);
     } else {
