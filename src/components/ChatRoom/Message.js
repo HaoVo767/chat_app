@@ -1,4 +1,4 @@
-import { Avatar, Typography } from "antd";
+import { Avatar, Image, Typography } from "antd";
 import { formatRelative } from "date-fns";
 import { MessageOptionMe, MessageOptionYou } from "./MessageOption";
 import { MessageEmotion } from "../ulity/Emoji";
@@ -18,7 +18,7 @@ const formatDate = (seconds) => {
   return formattedDate;
 };
 
-export function MessageYou({ text, displayName, createAt, photoURL, messageId, replyFrom, emotions }) {
+export function MessageYou({ text, displayName, createAt, photoURL, messageId, replyFrom, emotions, imgSrc }) {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const backgroundColorMessageYou = user.mode === "LIGHT" ? "rgb(248 250 252)" : "rgb(64 64 64)";
   return (
@@ -113,6 +113,7 @@ export function MessageYou({ text, displayName, createAt, photoURL, messageId, r
           >
             {text}
           </Typography>
+          <Image src={imgSrc} width={200} alt="" />
           <div className="relative bottom-2">
             <Emotion emotions={emotions} />
           </div>
@@ -125,7 +126,7 @@ export function MessageYou({ text, displayName, createAt, photoURL, messageId, r
     </>
   );
 }
-export function MessageMe({ text, displayName, createAt, photoURL, messageId, replyFrom, emotions }) {
+export function MessageMe({ text, displayName, createAt, photoURL, messageId, replyFrom, emotions, imgSrc }) {
   const user = JSON.parse(sessionStorage.getItem("user"));
   const backgroundColorMessageMe = user?.mode === "LIGHT" ? "rgb(2 132 199)" : "rgb(63 98 18)";
   return (
@@ -204,7 +205,7 @@ export function MessageMe({ text, displayName, createAt, photoURL, messageId, re
           <div
             className="p-2 rounded-xl mr-20"
             style={{
-              width: text.length > 80 ? "800px" : "max-content",
+              width: text?.length > 80 ? "800px" : "max-content",
               backgroundColor: backgroundColorMessageMe,
             }}
           >
@@ -225,6 +226,7 @@ export function MessageMe({ text, displayName, createAt, photoURL, messageId, re
             <Typography className="ml-9 text-lg" style={{ fontFamily: "Helvetica", color: "#EEE" }}>
               {text}
             </Typography>
+            <Image src={imgSrc} width={200} alt="" />
           </div>
           <div className="relative bottom-4 left-4 w-52">
             <Emotion emotions={emotions} />

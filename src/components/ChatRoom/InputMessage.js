@@ -6,6 +6,7 @@ import { AppContext } from "../../Context/AppProvider";
 import { useSelector, useDispatch } from "react-redux";
 import { MessagesSlice } from "./MessagesSlice";
 import Icons from "../ulity/Icons";
+import { BsImage } from "react-icons/bs";
 
 export default function InputMessage() {
   const dispatch = useDispatch();
@@ -15,6 +16,7 @@ export default function InputMessage() {
   const messagesReply = useSelector((state) => state.messages?.replyMessage);
   const { selectedRoom } = useContext(AppContext);
   const [inputValue, setInputValue] = useState("");
+  const [imgSrc, setImgSrc] = useState("");
   const [isOpenIcons, setIsOpenIcons] = useState(false);
   const user = JSON.parse(sessionStorage.getItem("user"));
   const selectedRoomId = sessionStorage.getItem("roomId");
@@ -72,13 +74,49 @@ export default function InputMessage() {
             },
           ],
         });
-        dispatch(MessagesSlice.actions.replyMessage(null));
       }
     }
     setInputValue("");
   };
+  useEffect(() => {
+    if (imgSrc !== "") {
+      const roomId = selectedRoomId || "1";
+      const roomRef = db.collection("rooms").doc(roomId);
+      roomRef.update({
+        messages: [
+          ...selectedRoom.messages,
+          {
+            imgSrc: imgSrc,
+            uid: user.uid,
+            photoURL: user?.providerData?.length > 0 ? user.providerData[0].photoURL : user?.photoURL,
+            displayName: user.displayName,
+            createAt: firebase.firestore.Timestamp.now(),
+            id: Date.now(),
+            delete: 0,
+            emotion: [],
+          },
+        ],
+      });
+      dispatch(MessagesSlice.actions.replyMessage(null));
+    }
+  }, [imgSrc]);
+  function previewImage(e) {
+    var reader = new FileReader();
+    reader.readAsDataURL(e.target.files[0]);
+    reader.onloadend = function () {
+      console.log(reader.result);
+      setImgSrc(reader.result);
+    };
+  }
   return (
     <>
+      <input
+        type="file"
+        id="inputImage"
+        accept="image/*"
+        onChange={(e) => previewImage(e)}
+        style={{ display: "none" }}
+      />
       <Form
         className="w-full"
         style={{
@@ -104,6 +142,12 @@ export default function InputMessage() {
                 onClick={() => setIsOpenIcons(false)}
               />
             </div>
+            <BsImage
+              className="hover: cursor-pointer text-lg relative top-5 right-32"
+              onClick={() => {
+                document.getElementById("inputImage").click();
+              }}
+            />
             <div className="w-[0px] flex">
               <div className="absolute right-28 bottom-4" onClick={() => setIsOpenIcons(true)}>
                 <Icons bottom={"10px"} right={"0px"} isOpenIcons={isOpenIcons} place={"inputMessage"} />

@@ -15,7 +15,7 @@ export function MessageOptionMe({ messageId }) {
   const friendChatRoomId = sessionStorage.getItem("friendChat");
   const dispatch = useDispatch();
   const handleDeleteMessage = () => {
-    if (typeRoom === 1) {
+    if (typeRoom === "1") {
       const roomId = selectedRoomId || "1";
       const roomRef = db.collection("rooms").doc(roomId);
       roomRef.get().then((doc) => {
@@ -69,7 +69,7 @@ export function MessageOptionMe({ messageId }) {
     });
   };
   const handlePinMessage = () => {
-    if (typeRoom === 1) {
+    if (typeRoom === "1") {
       const roomId = selectedRoomId || "1";
       const roomRef = db.collection("rooms").doc(roomId);
       roomRef.get().then((doc) => {

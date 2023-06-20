@@ -16,7 +16,7 @@ export const MessageEmotion = ({ messageId, placement }) => {
         emotion: emotion,
       },
     ];
-    if (typeRoom === 1) {
+    if (typeRoom === "1") {
       const roomId = selectedRoomId || "1";
       const roomRef = db.collection("rooms").doc(roomId);
       roomRef.get().then((doc) => {

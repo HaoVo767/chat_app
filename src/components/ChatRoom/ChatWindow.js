@@ -75,7 +75,7 @@ export default function ChatWindow() {
       if (isGetMessage) {
         scrollToNewestMessage();
       }
-    }, 1000);
+    }, 2000);
   }, [selectedRoomId, isGetMessage]);
 
   useEffect(() => {
@@ -121,6 +121,7 @@ export default function ChatWindow() {
                       messageId={message.id}
                       replyFrom={message?.replyFrom}
                       emotions={message?.emotion}
+                      imgSrc={message.imgSrc}
                     />
                   );
                 } else if (message.uid === user.uid && message.delete === 1) {
@@ -136,6 +137,7 @@ export default function ChatWindow() {
                       messageId={message.id}
                       replyFrom={message?.replyFrom}
                       emotions={message?.emotion}
+                      imgSrc={message.imgSrc}
                     />
                   );
                 } else if (message.uid !== user.uid && message.delete === 1) {

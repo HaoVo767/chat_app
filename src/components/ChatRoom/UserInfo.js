@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { generateKeywords } from "../../firebase/service";
 import { useFirestore } from "../../hooks/useFirestore";
 import { debounce } from "lodash";
-import { AiOutlineEdit, AiOutlinePicture } from "react-icons/ai";
+import { AiOutlineEdit, AiOutlinePicture, AiOutlineHome } from "react-icons/ai";
 import { MdLogout, MdPersonAddAlt } from "react-icons/md";
 import { HiSun, HiMoon } from "react-icons/hi";
 import { BsPeople, BsPeopleFill } from "react-icons/bs";
@@ -256,6 +256,17 @@ export default function UserInfo() {
     setRadioInputValue(e.target.value);
   };
   const items = [
+    {
+      key: "0",
+      label: (
+        <div className="flex hover:text-blue-400">
+          <span style={{ fontFamily: "Helvetica" }} className="text-base" onClick={() => navigate("/me")}>
+            Trang cá nhân
+          </span>
+          <AiOutlineHome className="relative left-2 text-xl" />
+        </div>
+      ),
+    },
     {
       key: "1",
       label: (

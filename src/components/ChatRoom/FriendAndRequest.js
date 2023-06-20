@@ -1,6 +1,5 @@
 import { Avatar, Button, Col, Row, Typography } from "antd";
-import React, { useContext, useMemo } from "react";
-import { AppContext } from "../../Context/AppProvider";
+import React, { useMemo } from "react";
 import { db } from "../../firebase/configure";
 import { addDocument } from "../../firebase/service";
 import { useFirestore } from "../../hooks/useFirestore";
