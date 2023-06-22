@@ -164,7 +164,7 @@ export function MessageOptionYou({ messageId }) {
     });
   };
   const handlePinMessage = () => {
-    if (typeRoom === 1) {
+    if (typeRoom === "1") {
       const roomId = selectedRoomId || "1";
       const roomRef = db.collection("rooms").doc(roomId);
       roomRef.get().then((doc) => {

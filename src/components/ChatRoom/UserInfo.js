@@ -260,7 +260,7 @@ export default function UserInfo() {
       key: "0",
       label: (
         <div className="flex hover:text-blue-400">
-          <span style={{ fontFamily: "Helvetica" }} className="text-base" onClick={() => navigate("/me")}>
+          <span style={{ fontFamily: "Helvetica" }} className="text-base" onClick={() => navigate(`/user/${user.uid}`)}>
             Trang cá nhân
           </span>
           <AiOutlineHome className="relative left-2 text-xl" />
@@ -500,7 +500,7 @@ export default function UserInfo() {
           extra={<div className="text-lg">({numberOfFriend})</div>}
         >
           {currentUser[0]?.friends.length > 0 &&
-            currentUser[0]?.friends.map((friend) => {
+            currentUser[0]?.friends.map((friend, index) => {
               return (
                 <Friend
                   displayName={friend?.displayName}
@@ -508,6 +508,7 @@ export default function UserInfo() {
                   yourId={friend?.id}
                   key={friend?.id}
                   myId={currentUser[0]?.id}
+                  uid={currentUser[0].listFriendsUid[index]}
                 />
               );
             })}

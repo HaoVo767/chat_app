@@ -3,9 +3,10 @@ import React, { useMemo } from "react";
 import { db } from "../../firebase/configure";
 import { addDocument } from "../../firebase/service";
 import { useFirestore } from "../../hooks/useFirestore";
-
+import { useNavigate } from "react-router-dom";
 export function Request({ displayName, photoURL, uid, userSentRequetsId, userReceiveId }) {
   const user = JSON.parse(sessionStorage.getItem("user"));
+
   const userCondition = useMemo(() => {
     return {
       fieldName: "uid",
@@ -81,13 +82,14 @@ export function Request({ displayName, photoURL, uid, userSentRequetsId, userRec
   );
 }
 
-export function Friend({ displayName, photoURL, yourId, myId }) {
+export function Friend({ displayName, photoURL, yourId, myId, uid }) {
+  const navigate = useNavigate();
   return (
     <Row className="mb-3">
       <Col span={2}></Col>
       <Col span={22}>
-        <Row>
-          <Avatar size="large" src={photoURL} className="text-2xl bg-slate-100 cursor-pointer"></Avatar>
+        <Row className="cursor-pointer" onClick={() => navigate(`/user/${uid}`)}>
+          <Avatar size="large" src={photoURL} className="text-2xl bg-slate-100 "></Avatar>
           <Typography style={{ fontFamily: "Helvetica" }} className="text-lg mt-2 ml-2">
             {displayName}
           </Typography>

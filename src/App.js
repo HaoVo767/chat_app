@@ -12,7 +12,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Navigate replace to="/login" />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/me" element={<PersonalPage />} />
+          <Route path="/user/:id" element={<PersonalPage />} />
           <Route element={<ChatRoom />} path="/chat-room" />
         </Routes>
       </AppProvider>

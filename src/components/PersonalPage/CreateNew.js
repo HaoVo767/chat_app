@@ -6,6 +6,8 @@ import ImgCrop from "antd-img-crop";
 export default function CreateNew() {
   const { TextArea } = Input;
   const [fileList, setFileList] = useState([]);
+  const user = JSON.parse(sessionStorage.getItem("user"));
+  const [textValue, setTextValue] = useState("");
   const onChange = ({ fileList: newFileList }) => {
     setFileList(newFileList);
   };
@@ -23,9 +25,26 @@ export default function CreateNew() {
     const imgWindow = window.open(src);
     imgWindow?.document.write(image.outerHTML);
   };
-  useEffect(() => {
-    console.log(fileList);
-  }, [fileList]);
+
+  const handleChangeTextValue = (e) => {
+    setTextValue(e.target.value);
+  };
+
+  const handleAddPost = () => {
+    let list = [];
+    fileList.map((file) => {
+      list.push(file.thumbUrl);
+    });
+    return fetch("", {
+      body: JSON.stringify({
+        creator: user.displayName,
+        postContent: textValue,
+        media: list,
+        comment: [],
+        heart: [],
+      }),
+    });
+  };
   return (
     <div className="">
       <Card
@@ -35,19 +54,23 @@ export default function CreateNew() {
           width: "50%",
           margin: "auto",
         }}
-        extra={<Button style={{ color: "#fff", background: "#1677ff" }}>Đăng</Button>}
+        extra={
+          <Button style={{ color: "#fff", background: "#1677ff" }} onClick={handleAddPost}>
+            Đăng
+          </Button>
+        }
       >
-        <TextArea rows={4} />
+        <TextArea rows={4} value={textValue} onChange={handleChangeTextValue} />
         <div className="mt-2"></div>
         <ImgCrop rotationSlider>
           <Upload
-            action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+            // action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
             listType="picture-card"
             fileList={fileList}
             onChange={onChange}
             onPreview={onPreview}
           >
-            {fileList.length < 7 && "+ Upload"}
+            {fileList.length < 6 && "+ Upload"}
           </Upload>
         </ImgCrop>
       </Card>
