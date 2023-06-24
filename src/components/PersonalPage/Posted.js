@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 
 export default function Posted() {
   const { id } = useParams();
-  console.log("id", id);
   const [posts, setPost] = useState([]);
   useEffect(() => {
     fetch(`http://localhost:9000/user/${id}`)

@@ -12,7 +12,7 @@ export default function Icons({ bottom, right, isOpenIcons, place }) {
       .then((response) => response.json())
       .then((result) => setIcons(result.listIcons))
       .catch((err) => console.log(err));
-  });
+  }, []);
 
   const handleAddIcon = (icon) => {
     switch (place) {
