@@ -5,10 +5,18 @@ import { BiComment } from "react-icons/bi";
 export default function PostCard({ post }) {
   const { creator, postContent, media, heart, comment, _id } = post;
   const user = JSON.parse(sessionStorage.getItem("user"));
-  const [displayHeart, setDisplayHeart] = useState(true);
+  const [displayHeart, setDisplayHeart] = useState(() => {
+    if (JSON.stringify(heart).includes(JSON.stringify(user.uid))) return true;
+    else return false;
+  });
+  const [likeClick, setLikeClick] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [likeList, setLikeList] = useState([]);
+  const [likeList, setLikeList] = useState(heart);
 
+  // useEffect(() => {
+  //   if (JSON.stringify(likeList).includes(JSON.stringify(user.uid))) setDisplayHeart(true);
+  //   else setDisplayHeart(false);
+  // }, [likeList, user.uid]);
   useEffect(() => {
     var myHeaders = new Headers();
     myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
@@ -22,14 +30,22 @@ export default function PostCard({ post }) {
       method: "POST",
     })
       .then((response) => response.text())
-      .then((result) => setLikeList(JSON.parse(result)))
+      .then((result) => {
+        setLikeList(JSON.parse(result));
+        if (result.includes(JSON.stringify(user.uid))) {
+          setDisplayHeart(true);
+        } else {
+          setDisplayHeart(false);
+        }
+      })
       .catch((err) => console.log(err));
-  }, [displayHeart]);
+  }, [likeClick, _id, user.uid, user.photoURL, user.displayName]);
   useEffect(() => {
     console.log(likeList);
   }, [likeList]);
   const handleAddHeart = () => {
     setDisplayHeart(!displayHeart);
+    setLikeClick(!likeClick);
   };
 
   const handleOk = () => {
@@ -70,27 +86,26 @@ export default function PostCard({ post }) {
           </div>
         </Image.PreviewGroup>
         <div className="mt-3 flex">
-          {displayHeart && (
+          {!displayHeart && (
             <div className="flex">
               <div className="text-3xl hover: cursor-pointer mr-1" onClick={handleAddHeart}>
                 <AiFillHeart style={{ color: "gray" }} />
               </div>
-              <div className="text-base mt-0.5 mr-8 hover: cursor-pointer" onClick={handleShowLikeList}>
-                {heart?.length} lượt thích
-              </div>
             </div>
           )}
-
-          {!displayHeart && (
+          {displayHeart && (
             <div className="flex">
               <div className="text-3xl hover: cursor-pointer mr-1" onClick={handleAddHeart}>
                 <AiFillHeart style={{ color: "red" }} />
               </div>
-              <div className="text-base mt-0.5 mr-8 hover: cursor-pointer" onClick={handleShowLikeList}>
-                {heart?.length + 1} lượt thích
-              </div>
             </div>
           )}
+          <div className="text-base mt-0.5 mr-8 hover: cursor-pointer" onClick={handleShowLikeList}>
+            {likeList?.length} lượt thích
+          </div>
+          {/* <div className="text-base mt-0.5 mr-8 hover: cursor-pointer" onClick={handleShowLikeList}>
+                {heart?.length + 1} lượt thích
+              </div> */}
           <div className="flex flex-1 hover:cursor-pointer">
             <div className="mr-1 text-lg">Comment</div>
             <div className="text-base mt-0.5 mr-1">({comment?.length})</div> <BiComment className=" text-2xl mt-1" />
