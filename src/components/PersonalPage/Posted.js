@@ -6,7 +6,7 @@ export default function Posted() {
   const { id } = useParams();
   const [posts, setPost] = useState([]);
   useEffect(() => {
-    fetch(`http://localhost:9000/user/${id}`)
+    fetch(`https://chat-app-backend-opal.vercel.app/user/${id}`)
       .then((response) => response.text())
       .then((result) => setPost(JSON.parse(result)))
       .catch((error) => console.log(error));

@@ -24,7 +24,7 @@ export default function PostCard({ post }) {
     urlencoded.append("name", user.displayName);
     urlencoded.append("photoURL", user.photoURL);
     urlencoded.append("uid", user.uid);
-    fetch(`http://localhost:9000/update-like/${_id}`, {
+    fetch(`https://chat-app-backend-opal.vercel.app/update-like/${_id}`, {
       headers: myHeaders,
       body: urlencoded,
       method: "POST",

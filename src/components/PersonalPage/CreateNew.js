@@ -53,7 +53,7 @@ export default function CreateNew() {
       redirect: "follow",
     };
 
-    // fetch("http://localhost:9000/me/create", requestOptions).then(() => window.location.reload());
+    fetch("https://chat-app-backend-opal.vercel.app/me/create", requestOptions).then(() => window.location.reload());
   };
   return (
     <div className="">

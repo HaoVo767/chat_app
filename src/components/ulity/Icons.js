@@ -8,7 +8,7 @@ export default function Icons({ bottom, right, isOpenIcons, place }) {
   const dispatch = useDispatch();
   const [icons, setIcons] = useState([]);
   useEffect(() => {
-    fetch("http://localhost:9000/icons")
+    fetch("https://chat-app-backend-opal.vercel.app/icons")
       .then((response) => response.json())
       .then((result) => setIcons(result.listIcons))
       .catch((err) => console.log(err));
